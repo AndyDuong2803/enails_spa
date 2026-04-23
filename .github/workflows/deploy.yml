@@ -20,8 +20,13 @@ jobs:
         REMOTE_USER: ${{ secrets.SERVER_USER }}
         SOURCE: "site/"
         TARGET: "/home/deploy/projects/enails_spa/html/"
+        ARGS: "-rlzvc --delete"
         SCRIPT_BEFORE: |
           mkdir -p /home/deploy/projects/enails_spa/html
+          if command -v sudo >/dev/null 2>&1; then
+            sudo chown -R deploy:deploy /home/deploy/projects/enails_spa/html || true
+          fi
+          chmod -R u+rwX /home/deploy/projects/enails_spa/html || true
           echo "Bắt đầu deploy..."
         SCRIPT_AFTER: |
           echo "Deploy thành công!"
