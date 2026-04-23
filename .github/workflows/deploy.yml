@@ -23,10 +23,11 @@ jobs:
         ARGS: "-rlzvc --delete"
         SCRIPT_BEFORE: |
           mkdir -p /home/deploy/projects/enails_spa/html
-          if command -v sudo >/dev/null 2>&1; then
-            sudo chown -R deploy:deploy /home/deploy/projects/enails_spa/html || true
+          if [ ! -w /home/deploy/projects/enails_spa/html ]; then
+            echo "ERROR: deploy user has no write permission on /home/deploy/projects/enails_spa/html"
+            echo "Run once on VPS as root: chown -R deploy:deploy /home/deploy/projects/enails_spa/html && chmod -R u+rwX /home/deploy/projects/enails_spa/html"
+            exit 1
           fi
-          chmod -R u+rwX /home/deploy/projects/enails_spa/html || true
           echo "Bắt đầu deploy..."
         SCRIPT_AFTER: |
           echo "Deploy thành công!"
