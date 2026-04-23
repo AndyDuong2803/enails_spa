@@ -1,0 +1,26 @@
+name: Deploy Static Web
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Kéo code về
+      uses: actions/checkout@v3
+
+    - name: Deploy lên VPS
+      uses: easingthemes/ssh-deploy@main
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+        REMOTE_USER: ${{ secrets.SERVER_USER }}
+        SOURCE: "site/"
+        TARGET: "/home/deploy/projects/enail_spa/html/"
+        SCRIPT_BEFORE: |
+          echo "Bắt đầu deploy..."
+        SCRIPT_AFTER: |
+          echo "Deploy thành công!"
