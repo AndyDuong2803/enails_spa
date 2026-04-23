@@ -1,5 +1,6 @@
 name: Deploy Static Web
 
+# Kích hoạt khi có code đẩy lên nhánh main
 on:
   push:
     branches: [ main ]
@@ -9,25 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Kéo code về
+    # Bước 1: Lấy code từ GitHub
+    - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Deploy lên VPS
+    # Bước 2: Bê nguyên thư mục 'site' ném thẳng lên VPS
+    - name: Sync files to VPS
       uses: easingthemes/ssh-deploy@main
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         REMOTE_HOST: ${{ secrets.SERVER_HOST }}
         REMOTE_USER: ${{ secrets.SERVER_USER }}
+        # Thay đổi SOURCE thành thư mục site/ của bạn
         SOURCE: "site/"
+        # Đích đến trên VPS
         TARGET: "/home/deploy/projects/enails_spa/html/"
-        ARGS: "-rlzvc --delete"
+        # Bỏ đi các lệnh sudo chmod gây lỗi
         SCRIPT_BEFORE: |
-          mkdir -p /home/deploy/projects/enails_spa/html
-          if [ ! -w /home/deploy/projects/enails_spa/html ]; then
-            echo "ERROR: deploy user has no write permission on /home/deploy/projects/enails_spa/html"
-            echo "Run once on VPS as root: chown -R deploy:deploy /home/deploy/projects/enails_spa/html && chmod -R u+rwX /home/deploy/projects/enails_spa/html"
-            exit 1
-          fi
-          echo "Bắt đầu deploy..."
+          echo "Bắt đầu dọn dẹp và đồng bộ code mới..."
         SCRIPT_AFTER: |
-          echo "Deploy thành công!"
+          echo "Thành công! Nginx sẽ tự động cập nhật giao diện."
