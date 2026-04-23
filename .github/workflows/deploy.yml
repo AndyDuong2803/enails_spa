@@ -19,8 +19,9 @@ jobs:
         REMOTE_HOST: ${{ secrets.SERVER_HOST }}
         REMOTE_USER: ${{ secrets.SERVER_USER }}
         SOURCE: "site/"
-        TARGET: "/home/deploy/projects/enail_spa/html/"
+        TARGET: "/home/deploy/projects/enails_spa/html/"
         SCRIPT_BEFORE: |
+          mkdir -p /home/deploy/projects/enails_spa/html
           echo "Bắt đầu deploy..."
         SCRIPT_AFTER: |
           echo "Deploy thành công!"
