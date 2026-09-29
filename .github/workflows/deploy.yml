@@ -1,32 +1,30 @@
-name: Deploy Static Web
+name: Deploy to GitHub Pages
 
-# Kích hoạt khi có code đẩy lên nhánh main
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-
     steps:
-    # Bước 1: Lấy code từ GitHub
-    - name: Checkout Code
-      uses: actions/checkout@v3
-
-    # Bước 2: Bê nguyên thư mục 'site' ném thẳng lên VPS
-    - name: Sync files to VPS
-      uses: easingthemes/ssh-deploy@main
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        REMOTE_HOST: ${{ secrets.SERVER_HOST }}
-        REMOTE_USER: ${{ secrets.SERVER_USER }}
-        # Thay đổi SOURCE thành thư mục site/ của bạn
-        SOURCE: "site/"
-        # Đích đến trên VPS
-        TARGET: "/home/deploy/projects/enails_spa/html/"
-        # Bỏ đi các lệnh sudo chmod gây lỗi
-        SCRIPT_BEFORE: |
-          echo "Bắt đầu dọn dẹp và đồng bộ code mới..."
-        SCRIPT_AFTER: |
-          echo "Thành công! Nginx sẽ tự động cập nhật giao diện."
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
